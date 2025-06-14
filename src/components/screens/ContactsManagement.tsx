@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Eye, Trash2, Mail, Clock, CheckCircle, AlertCircle } from 'lucide-react';
 import { Screen } from '../../App';
 
@@ -6,69 +6,54 @@ interface ContactsManagementProps {
   onNavigate: (screen: Screen, item?: any) => void;
 }
 
+interface Contact {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  subject: string;
+  message: string;
+}
+
 export default function ContactsManagement({ onNavigate }: ContactsManagementProps) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Mock data for contacts
-  const contacts = [
-    {
-      id: 1,
-      senderName: 'John Smith',
-      senderEmail: 'john.smith@email.com',
-      subject: 'Inquiry about Web Development Services',
-      message: 'Hi, I am interested in your web development services. Could you please provide more information about your pricing and timeline?',
-      receivedDate: '2024-01-15 10:30 AM',
-      status: 'unread'
-    },
-    {
-      id: 2,
-      senderName: 'Sarah Johnson',
-      senderEmail: 'sarah.j@company.com',
-      subject: 'Partnership Opportunity',
-      message: 'Hello, I represent a marketing agency and would like to discuss potential partnership opportunities with your company.',
-      receivedDate: '2024-01-14 03:45 PM',
-      status: 'read'
-    },
-    {
-      id: 3,
-      senderName: 'Mike Davis',
-      senderEmail: 'mike.davis@startup.io',
-      subject: 'Mobile App Development Quote',
-      message: 'We are a startup looking for mobile app development services. Can you provide a quote for iOS and Android app development?',
-      receivedDate: '2024-01-14 09:15 AM',
-      status: 'unread'
-    },
-    {
-      id: 4,
-      senderName: 'Emily Wilson',
-      senderEmail: 'emily.wilson@nonprofit.org',
-      subject: 'Non-profit Website Redesign',
-      message: 'Our non-profit organization needs a website redesign. Do you offer any special rates for non-profit organizations?',
-      receivedDate: '2024-01-13 02:20 PM',
-      status: 'read'
-    },
-    {
-      id: 5,
-      senderName: 'David Brown',
-      senderEmail: 'david.brown@enterprise.com',
-      subject: 'Enterprise Software Development',
-      message: 'We need a custom enterprise software solution. Could we schedule a meeting to discuss our requirements?',
-      receivedDate: '2024-01-12 11:00 AM',
-      status: 'unread'
-    }
-  ];
+  useEffect(() => {
+    const fetchContacts = async () => {
+      try {
+        const response = await fetch('https://api.thaneforestdivision.com/api/contacts/');
+        const data = await response.json();
+        setContacts(data);
+      } catch (error) {
+        console.error('Error fetching contacts:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchContacts();
+  }, []);
 
   const filteredContacts = contacts.filter(contact => {
     const matchesSearch = 
-      contact.senderName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      contact.senderEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      contact.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       contact.subject.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesStatus = statusFilter === 'all' || contact.status === statusFilter;
-    
-    return matchesSearch && matchesStatus;
+    return matchesSearch;
   });
+
+  if (loading) {
+    return (
+      <div className="p-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-slate-600">Loading contacts...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6">
@@ -80,7 +65,7 @@ export default function ContactsManagement({ onNavigate }: ContactsManagementPro
         </div>
         <div className="flex items-center space-x-4">
           <div className="text-sm bg-blue-50 text-blue-600 px-3 py-1 rounded-full">
-            {contacts.filter(c => c.status === 'unread').length} unread messages
+            {contacts.length} total messages
           </div>
         </div>
       </div>
@@ -98,15 +83,6 @@ export default function ContactsManagement({ onNavigate }: ContactsManagementPro
               className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="all">All Status</option>
-            <option value="unread">Unread</option>
-            <option value="read">Read</option>
-          </select>
           <div className="text-sm text-slate-600">
             {filteredContacts.length} messages found
           </div>
@@ -121,48 +97,30 @@ export default function ContactsManagement({ onNavigate }: ContactsManagementPro
               <tr>
                 <th className="text-left py-3 px-6 font-medium text-slate-900">Sender</th>
                 <th className="text-left py-3 px-6 font-medium text-slate-900">Subject</th>
-                <th className="text-left py-3 px-6 font-medium text-slate-900">Received Date</th>
-                <th className="text-left py-3 px-6 font-medium text-slate-900">Status</th>
+                <th className="text-left py-3 px-6 font-medium text-slate-900">Phone</th>
                 <th className="text-left py-3 px-6 font-medium text-slate-900">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredContacts.map((contact, index) => (
-                <tr key={contact.id} className={`border-b border-slate-200 hover:bg-slate-50 ${index % 2 === 0 ? 'bg-white' : 'bg-slate-25'} ${contact.status === 'unread' ? 'bg-blue-50/30' : ''}`}>
+                <tr key={contact.id} className={`border-b border-slate-200 hover:bg-slate-50 ${index % 2 === 0 ? 'bg-white' : 'bg-slate-25'}`}>
                   <td className="py-4 px-6">
                     <div className="flex items-center space-x-3">
                       <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
                         <Mail className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <div className="font-medium text-slate-900">{contact.senderName}</div>
-                        <div className="text-sm text-slate-600">{contact.senderEmail}</div>
+                        <div className="font-medium text-slate-900">{contact.name}</div>
+                        <div className="text-sm text-slate-600">{contact.email}</div>
                       </div>
                     </div>
                   </td>
                   <td className="py-4 px-6">
                     <div className="font-medium text-slate-900 max-w-md truncate">{contact.subject}</div>
+                    <div className="text-sm text-slate-600 max-w-md truncate">{contact.message}</div>
                   </td>
                   <td className="py-4 px-6">
-                    <div className="flex items-center space-x-2 text-slate-600">
-                      <Clock className="w-4 h-4" />
-                      <span>{contact.receivedDate}</span>
-                    </div>
-                  </td>
-                  <td className="py-4 px-6">
-                    <div className="flex items-center space-x-2">
-                      {contact.status === 'unread' ? (
-                        <>
-                          <AlertCircle className="w-4 h-4 text-orange-500" />
-                          <span className="text-orange-600 font-medium">Unread</span>
-                        </>
-                      ) : (
-                        <>
-                          <CheckCircle className="w-4 h-4 text-green-500" />
-                          <span className="text-green-600 font-medium">Read</span>
-                        </>
-                      )}
-                    </div>
+                    <div className="text-slate-600">{contact.phone}</div>
                   </td>
                   <td className="py-4 px-6">
                     <div className="flex items-center space-x-2">
