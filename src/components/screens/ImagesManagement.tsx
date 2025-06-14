@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, Search, Edit, Trash2, Eye } from 'lucide-react';
 import { Screen } from '../../App';
 
@@ -6,45 +6,46 @@ interface ImagesManagementProps {
   onNavigate: (screen: Screen, item?: any) => void;
 }
 
+interface Image {
+  id: number;
+  name: string;
+  photo: string;
+}
+
 export default function ImagesManagement({ onNavigate }: ImagesManagementProps) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [images, setImages] = useState<Image[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Mock data for images
-  const images = [
-    {
-      id: 1,
-      title: 'Homepage Hero Image',
-      description: 'Main banner image for the homepage',
-      thumbnail: 'https://images.pexels.com/photos/3184287/pexels-photo-3184287.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&dpr=1',
-      createdAt: '2024-01-15'
-    },
-    {
-      id: 2,
-      title: 'Product Showcase',
-      description: 'Featured product image for marketing',
-      thumbnail: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&dpr=1',
-      createdAt: '2024-01-14'
-    },
-    {
-      id: 3,
-      title: 'Team Photo',
-      description: 'Official team photo for about page',
-      thumbnail: 'https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&dpr=1',
-      createdAt: '2024-01-13'
-    },
-    {
-      id: 4,
-      title: 'Office Space',
-      description: 'Modern office interior for corporate page',
-      thumbnail: 'https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&dpr=1',
-      createdAt: '2024-01-12'
-    }
-  ];
+  useEffect(() => {
+    const fetchImages = async () => {
+      try {
+        const response = await fetch('https://api.thaneforestdivision.com/api/photos/');
+        const data = await response.json();
+        setImages(data);
+      } catch (error) {
+        console.error('Error fetching images:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchImages();
+  }, []);
 
   const filteredImages = images.filter(image =>
-    image.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    image.description.toLowerCase().includes(searchTerm.toLowerCase())
+    image.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  if (loading) {
+    return (
+      <div className="p-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-slate-600">Loading images...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6">
@@ -89,9 +90,7 @@ export default function ImagesManagement({ onNavigate }: ImagesManagementProps) 
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
                 <th className="text-left py-3 px-6 font-medium text-slate-900">Preview</th>
-                <th className="text-left py-3 px-6 font-medium text-slate-900">Title</th>
-                <th className="text-left py-3 px-6 font-medium text-slate-900">Description</th>
-                <th className="text-left py-3 px-6 font-medium text-slate-900">Created</th>
+                <th className="text-left py-3 px-6 font-medium text-slate-900">Name</th>
                 <th className="text-left py-3 px-6 font-medium text-slate-900">Actions</th>
               </tr>
             </thead>
@@ -100,19 +99,13 @@ export default function ImagesManagement({ onNavigate }: ImagesManagementProps) 
                 <tr key={image.id} className={`border-b border-slate-200 hover:bg-slate-50 ${index % 2 === 0 ? 'bg-white' : 'bg-slate-25'}`}>
                   <td className="py-4 px-6">
                     <img
-                      src={image.thumbnail}
-                      alt={image.title}
+                      src={image.photo}
+                      alt={image.name}
                       className="w-16 h-16 object-cover rounded-lg border border-slate-200"
                     />
                   </td>
                   <td className="py-4 px-6">
-                    <div className="font-medium text-slate-900">{image.title}</div>
-                  </td>
-                  <td className="py-4 px-6">
-                    <div className="text-slate-600 max-w-xs truncate">{image.description}</div>
-                  </td>
-                  <td className="py-4 px-6">
-                    <div className="text-slate-600">{image.createdAt}</div>
+                    <div className="font-medium text-slate-900">{image.name}</div>
                   </td>
                   <td className="py-4 px-6">
                     <div className="flex items-center space-x-2">

@@ -8,11 +8,11 @@ interface ImageFormProps {
 }
 
 export default function ImageForm({ onNavigate, editingItem }: ImageFormProps) {
-  const [title, setTitle] = useState(editingItem?.title || '');
-  const [description, setDescription] = useState(editingItem?.description || '');
+  const [title, setTitle] = useState(editingItem?.name || '');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState(editingItem?.thumbnail || '');
+  const [previewUrl, setPreviewUrl] = useState(editingItem?.photo || '');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -29,12 +29,31 @@ export default function ImageForm({ onNavigate, editingItem }: ImageFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
-    // Simulate save process
-    setTimeout(() => {
-      setIsLoading(false);
+    setError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append('name', title);
+      
+      if (selectedFile) {
+        formData.append('photo', selectedFile);
+      }
+
+      const response = await fetch('https://api.thaneforestdivision.com/api/photos/', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to upload image');
+      }
+
       onNavigate('images');
-    }, 1000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred while uploading the image');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCancel = () => {
@@ -67,31 +86,16 @@ export default function ImageForm({ onNavigate, editingItem }: ImageFormProps) {
           {/* Image Title */}
           <div>
             <label htmlFor="title" className="block text-sm font-medium text-slate-700 mb-2">
-              Image Title *
+              Image Name *
             </label>
             <input
               id="title"
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Enter image title"
+              placeholder="Enter image name"
               className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               required
-            />
-          </div>
-
-          {/* Description */}
-          <div>
-            <label htmlFor="description" className="block text-sm font-medium text-slate-700 mb-2">
-              Description
-            </label>
-            <textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Enter image description"
-              rows={4}
-              className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
             />
           </div>
 
@@ -120,6 +124,7 @@ export default function ImageForm({ onNavigate, editingItem }: ImageFormProps) {
                 onChange={handleFileSelect}
                 className="hidden"
                 id="file-upload"
+                required={!editingItem}
               />
               <label
                 htmlFor="file-upload"
@@ -147,7 +152,7 @@ export default function ImageForm({ onNavigate, editingItem }: ImageFormProps) {
                   type="button"
                   onClick={() => {
                     setSelectedFile(null);
-                    setPreviewUrl(editingItem?.thumbnail || '');
+                    setPreviewUrl(editingItem?.photo || '');
                   }}
                   className="text-red-600 hover:text-red-700"
                 >
@@ -156,6 +161,13 @@ export default function ImageForm({ onNavigate, editingItem }: ImageFormProps) {
               </div>
             )}
           </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-sm text-red-600">{error}</p>
+            </div>
+          )}
 
           {/* Form Actions */}
           <div className="flex items-center justify-end space-x-4 pt-6 border-t border-slate-200">
@@ -174,7 +186,7 @@ export default function ImageForm({ onNavigate, editingItem }: ImageFormProps) {
               {isLoading ? (
                 <div className="flex items-center space-x-2">
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Saving...</span>
+                  <span>Uploading...</span>
                 </div>
               ) : (
                 'Save Image'

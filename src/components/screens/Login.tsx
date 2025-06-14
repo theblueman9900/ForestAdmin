@@ -30,7 +30,7 @@ export default function Login({ onLogin }: LoginProps) {
           <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <Building2 className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">AdminPro</h1>
+          <h1 className="text-3xl font-bold text-white mb-2">MAHARASHTRA FOREST DEPARTMENT</h1>
           <p className="text-slate-300">Sign in to your admin dashboard</p>
         </div>
 
@@ -82,23 +82,6 @@ export default function Login({ onLogin }: LoginProps) {
               </div>
             </div>
 
-            {/* Remember Me */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember"
-                  type="checkbox"
-                  className="w-4 h-4 text-blue-600 bg-slate-100 border-slate-300 rounded focus:ring-blue-500 focus:ring-2"
-                />
-                <label htmlFor="remember" className="ml-2 text-sm text-slate-700">
-                  Remember me
-                </label>
-              </div>
-              <a href="#" className="text-sm text-blue-600 hover:text-blue-700 transition-colors">
-                Forgot password?
-              </a>
-            </div>
-
             {/* Login Button */}
             <button
               type="submit"
@@ -127,7 +110,7 @@ export default function Login({ onLogin }: LoginProps) {
         {/* Footer */}
         <div className="text-center mt-6">
           <p className="text-slate-400 text-sm">
-            © 2025 AdminPro. All rights reserved.
+            © 2025 MAHARASHTRA FOREST DEPARTMENT. All rights reserved.
           </p>
         </div>
       </div>
