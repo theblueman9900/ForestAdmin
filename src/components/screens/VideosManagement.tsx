@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, Search, Edit, Trash2, Play, ExternalLink } from 'lucide-react';
 import { Screen } from '../../App';
 
@@ -6,49 +6,46 @@ interface VideosManagementProps {
   onNavigate: (screen: Screen, item?: any) => void;
 }
 
+interface Video {
+  id: number;
+  name: string;
+  video: string;
+}
+
 export default function VideosManagement({ onNavigate }: VideosManagementProps) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [videos, setVideos] = useState<Video[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Mock data for videos
-  const videos = [
-    {
-      id: 1,
-      title: 'Company Introduction',
-      description: 'Overview video showcasing our company values and mission',
-      videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-      duration: '3:45',
-      createdAt: '2024-01-15'
-    },
-    {
-      id: 2,
-      title: 'Product Demo',
-      description: 'Detailed demonstration of our flagship product features',
-      videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-      duration: '8:22',
-      createdAt: '2024-01-14'
-    },
-    {
-      id: 3,
-      title: 'Customer Testimonials',
-      description: 'Happy customers sharing their success stories',
-      videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-      duration: '5:18',
-      createdAt: '2024-01-13'
-    },
-    {
-      id: 4,
-      title: 'Behind the Scenes',
-      description: 'A look at our development process and team culture',
-      videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-      duration: '6:30',
-      createdAt: '2024-01-12'
-    }
-  ];
+  useEffect(() => {
+    const fetchVideos = async () => {
+      try {
+        const response = await fetch('https://api.thaneforestdivision.com/api/videos/');
+        const data = await response.json();
+        setVideos(data);
+      } catch (error) {
+        console.error('Error fetching videos:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVideos();
+  }, []);
 
   const filteredVideos = videos.filter(video =>
-    video.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    video.description.toLowerCase().includes(searchTerm.toLowerCase())
+    video.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  if (loading) {
+    return (
+      <div className="p-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-slate-600">Loading videos...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6">
@@ -92,11 +89,8 @@ export default function VideosManagement({ onNavigate }: VideosManagementProps) 
           <table className="w-full">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="text-left py-3 px-6 font-medium text-slate-900">Title</th>
-                <th className="text-left py-3 px-6 font-medium text-slate-900">Description</th>
-                <th className="text-left py-3 px-6 font-medium text-slate-900">Duration</th>
-                <th className="text-left py-3 px-6 font-medium text-slate-900">Video URL</th>
-                <th className="text-left py-3 px-6 font-medium text-slate-900">Created</th>
+                <th className="text-left py-3 px-6 font-medium text-slate-900">Name</th>
+                <th className="text-left py-3 px-6 font-medium text-slate-900">Video</th>
                 <th className="text-left py-3 px-6 font-medium text-slate-900">Actions</th>
               </tr>
             </thead>
@@ -108,19 +102,13 @@ export default function VideosManagement({ onNavigate }: VideosManagementProps) 
                       <div className="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center">
                         <Play className="w-5 h-5 text-white" />
                       </div>
-                      <div className="font-medium text-slate-900">{video.title}</div>
+                      <div className="font-medium text-slate-900">{video.name}</div>
                     </div>
-                  </td>
-                  <td className="py-4 px-6">
-                    <div className="text-slate-600 max-w-xs truncate">{video.description}</div>
-                  </td>
-                  <td className="py-4 px-6">
-                    <div className="text-slate-600">{video.duration}</div>
                   </td>
                   <td className="py-4 px-6">
                     <div className="flex items-center space-x-2">
                       <a
-                        href={video.videoUrl}
+                        href={video.video}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:text-blue-700 flex items-center space-x-1"
@@ -129,9 +117,6 @@ export default function VideosManagement({ onNavigate }: VideosManagementProps) 
                         <ExternalLink className="w-3 h-3" />
                       </a>
                     </div>
-                  </td>
-                  <td className="py-4 px-6">
-                    <div className="text-slate-600">{video.createdAt}</div>
                   </td>
                   <td className="py-4 px-6">
                     <div className="flex items-center space-x-2">
