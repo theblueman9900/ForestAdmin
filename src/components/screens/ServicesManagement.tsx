@@ -1,57 +1,53 @@
-import React, { useState } from 'react';
-import { Plus, Search, Edit, Trash2, CheckCircle, XCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, Search, Edit, Trash2, FileText } from 'lucide-react';
 import { Screen } from '../../App';
 
 interface ServicesManagementProps {
   onNavigate: (screen: Screen, item?: any) => void;
 }
 
+interface Service {
+  id: number;
+  title: string;
+  description: string;
+  file: string;
+}
+
 export default function ServicesManagement({ onNavigate }: ServicesManagementProps) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Mock data for services
-  const services = [
-    {
-      id: 1,
-      title: 'Web Development',
-      shortDescription: 'Custom website development using modern technologies',
-      status: 'active',
-      createdAt: '2024-01-15'
-    },
-    {
-      id: 2,
-      title: 'Mobile App Development',
-      shortDescription: 'Native and cross-platform mobile application development',
-      status: 'active',
-      createdAt: '2024-01-14'
-    },
-    {
-      id: 3,
-      title: 'Digital Marketing',
-      shortDescription: 'Comprehensive digital marketing strategies and campaigns',
-      status: 'inactive',
-      createdAt: '2024-01-13'
-    },
-    {
-      id: 4,
-      title: 'UI/UX Design',
-      shortDescription: 'User interface and user experience design services',
-      status: 'active',
-      createdAt: '2024-01-12'
-    },
-    {
-      id: 5,
-      title: 'Cloud Solutions',
-      shortDescription: 'Cloud infrastructure setup and migration services',
-      status: 'active',
-      createdAt: '2024-01-11'
-    }
-  ];
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const response = await fetch('https://api.thaneforestdivision.com/api/services/');
+        const data = await response.json();
+        setServices(data);
+      } catch (error) {
+        console.error('Error fetching services:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchServices();
+  }, []);
 
   const filteredServices = services.filter(service =>
     service.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    service.shortDescription.toLowerCase().includes(searchTerm.toLowerCase())
+    service.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  if (loading) {
+    return (
+      <div className="p-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-slate-600">Loading services...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6">
@@ -96,9 +92,8 @@ export default function ServicesManagement({ onNavigate }: ServicesManagementPro
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
                 <th className="text-left py-3 px-6 font-medium text-slate-900">Service Title</th>
-                <th className="text-left py-3 px-6 font-medium text-slate-900">Short Description</th>
-                <th className="text-left py-3 px-6 font-medium text-slate-900">Status</th>
-                <th className="text-left py-3 px-6 font-medium text-slate-900">Created</th>
+                <th className="text-left py-3 px-6 font-medium text-slate-900">Description</th>
+                <th className="text-left py-3 px-6 font-medium text-slate-900">File</th>
                 <th className="text-left py-3 px-6 font-medium text-slate-900">Actions</th>
               </tr>
             </thead>
@@ -109,25 +104,18 @@ export default function ServicesManagement({ onNavigate }: ServicesManagementPro
                     <div className="font-medium text-slate-900">{service.title}</div>
                   </td>
                   <td className="py-4 px-6">
-                    <div className="text-slate-600 max-w-md">{service.shortDescription}</div>
+                    <div className="text-slate-600 max-w-md">{service.description}</div>
                   </td>
                   <td className="py-4 px-6">
-                    <div className="flex items-center space-x-2">
-                      {service.status === 'active' ? (
-                        <>
-                          <CheckCircle className="w-4 h-4 text-green-500" />
-                          <span className="text-green-600 font-medium">Active</span>
-                        </>
-                      ) : (
-                        <>
-                          <XCircle className="w-4 h-4 text-red-500" />
-                          <span className="text-red-600 font-medium">Inactive</span>
-                        </>
-                      )}
-                    </div>
-                  </td>
-                  <td className="py-4 px-6">
-                    <div className="text-slate-600">{service.createdAt}</div>
+                    <a
+                      href={`https://api.thaneforestdivision.com${service.file}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center space-x-2 text-blue-600 hover:text-blue-700"
+                    >
+                      <FileText className="w-4 h-4" />
+                      <span>View File</span>
+                    </a>
                   </td>
                   <td className="py-4 px-6">
                     <div className="flex items-center space-x-2">
