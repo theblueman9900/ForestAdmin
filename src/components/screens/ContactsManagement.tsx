@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Eye, Trash2, Mail, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { Search, Eye, Trash2, Mail } from 'lucide-react';
 import { Screen } from '../../App';
 
 interface ContactsManagementProps {
@@ -19,6 +19,8 @@ export default function ContactsManagement({ onNavigate }: ContactsManagementPro
   const [searchTerm, setSearchTerm] = useState('');
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
+  const [viewContact, setViewContact] = useState<Contact | null>(null);
+  const [viewLoading, setViewLoading] = useState(false);
 
   useEffect(() => {
     const fetchContacts = async () => {
@@ -44,6 +46,32 @@ export default function ContactsManagement({ onNavigate }: ContactsManagementPro
     
     return matchesSearch;
   });
+
+  const handleDelete = async (id: number) => {
+    if (!window.confirm('Are you sure you want to delete this contact?')) return;
+    try {
+      await fetch(`https://api.thaneforestdivision.com/api/contacts/${id}/`, {
+        method: 'DELETE',
+      });
+      setContacts(contacts => contacts.filter(c => c.id !== id));
+    } catch (error) {
+      alert('Failed to delete contact.');
+    }
+  };
+
+  const handleView = async (id: number) => {
+    setViewLoading(true);
+    setViewContact(null);
+    try {
+      const response = await fetch(`https://api.thaneforestdivision.com/api/contacts/${id}/`);
+      const data = await response.json();
+      setViewContact(data);
+    } catch (error) {
+      alert('Failed to load contact details.');
+    } finally {
+      setViewLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -125,12 +153,14 @@ export default function ContactsManagement({ onNavigate }: ContactsManagementPro
                   <td className="py-4 px-6">
                     <div className="flex items-center space-x-2">
                       <button
-                        onClick={() => onNavigate('contact-view', contact)}
                         className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        onClick={() => handleView(contact.id)}
                       >
                         <Eye className="w-4 h-4" />
                       </button>
-                      <button className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                      <button className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        onClick={() => handleDelete(contact.id)}
+                      >
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -141,6 +171,32 @@ export default function ContactsManagement({ onNavigate }: ContactsManagementPro
           </table>
         </div>
       </div>
+
+      {/* Contact Detail Modal */}
+      {viewContact && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-8 shadow-xl max-w-md w-full relative">
+            <button
+              className="absolute top-2 right-2 text-slate-500 hover:text-slate-700"
+              onClick={() => setViewContact(null)}
+            >
+              &times;
+            </button>
+            {viewLoading ? (
+              <div className="text-center text-slate-600">Loading...</div>
+            ) : (
+              <>
+                <h2 className="text-xl font-bold text-slate-900 mb-2">{viewContact.name}</h2>
+                <div className="text-slate-600 mb-2">ID: {viewContact.id}</div>
+                <div className="mb-2 text-slate-700">Email: {viewContact.email}</div>
+                <div className="mb-2 text-slate-700">Phone: {viewContact.phone}</div>
+                <div className="mb-2 text-slate-700">Subject: {viewContact.subject}</div>
+                <div className="mb-4 text-slate-700">Message: {viewContact.message}</div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
