@@ -113,24 +113,22 @@ export default function ImagesManagement({ onNavigate }: ImagesManagementProps) 
           <h1 className="text-2xl font-bold text-slate-900">Images Management</h1>
           <p className="text-slate-600 mt-1">Manage your image library</p>
         </div>
-        <button
-          onClick={() => onNavigate('image-form')}
-          className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Add New Image</span>
-        </button>
-      </div>
-
-      {/* Bulk Delete Button */}
-      <div className="mb-4">
-        <button
-          onClick={handleBulkDelete}
-          disabled={selectedIds.length === 0}
-          className="bg-red-600 text-white px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Delete Selected
-        </button>
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={handleBulkDelete}
+            disabled={selectedIds.length === 0}
+            className="bg-red-600 text-white px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Delete Selected
+          </button>
+          <button
+            onClick={() => onNavigate('image-form')}
+            className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add New Image</span>
+          </button>
+        </div>
       </div>
 
       {/* Search and Filters */}

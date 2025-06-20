@@ -115,24 +115,22 @@ export default function ServicesManagement({ onNavigate }: ServicesManagementPro
           <h1 className="text-2xl font-bold text-slate-900">Services Management</h1>
           <p className="text-slate-600 mt-1">Manage your service offerings</p>
         </div>
-        <button
-          onClick={() => onNavigate('service-form')}
-          className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Add New Service</span>
-        </button>
-      </div>
-
-      {/* Bulk Delete Button */}
-      <div className="mb-4">
-        <button
-          onClick={handleBulkDelete}
-          disabled={selectedIds.length === 0}
-          className="bg-red-600 text-white px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Delete Selected
-        </button>
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={handleBulkDelete}
+            disabled={selectedIds.length === 0}
+            className="bg-red-600 text-white px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Delete Selected
+          </button>
+          <button
+            onClick={() => onNavigate('service-form')}
+            className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add New Service</span>
+          </button>
+        </div>
       </div>
 
       {/* Search and Filters */}
