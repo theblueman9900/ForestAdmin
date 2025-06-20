@@ -39,18 +39,26 @@ export default function ImageForm({ onNavigate, editingItem }: ImageFormProps) {
         formData.append('photo', selectedFile);
       }
 
-      const response = await fetch('https://api.thaneforestdivision.com/api/photos/', {
-        method: 'POST',
-        body: formData,
-      });
+      let response;
+      if (editingItem) {
+        response = await fetch(`https://api.thaneforestdivision.com/api/photos/${editingItem.id}/`, {
+          method: 'PUT',
+          body: formData,
+        });
+      } else {
+        response = await fetch('https://api.thaneforestdivision.com/api/photos/', {
+          method: 'POST',
+          body: formData,
+        });
+      }
 
       if (!response.ok) {
-        throw new Error('Failed to upload image');
+        throw new Error('Failed to save image');
       }
 
       onNavigate('images');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred while uploading the image');
+      setError(err instanceof Error ? err.message : 'An error occurred while saving the image');
     } finally {
       setIsLoading(false);
     }
