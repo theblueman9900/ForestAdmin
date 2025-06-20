@@ -32,12 +32,36 @@ export default function ServiceForm({ onNavigate, editingItem }: ServiceFormProp
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
-    // Simulate save process
-    setTimeout(() => {
-      setIsLoading(false);
+
+    try {
+      let response;
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('description', description);
+      if (selectedFile) {
+        formData.append('file', selectedFile);
+      }
+      if (editingItem) {
+        response = await fetch(`https://api.thaneforestdivision.com/api/services/${editingItem.id}/`, {
+          method: 'PUT',
+          body: formData,
+        });
+      } else {
+        response = await fetch('https://api.thaneforestdivision.com/api/services/', {
+          method: 'POST',
+          body: formData,
+        });
+      }
+      if (!response.ok) {
+        throw new Error('Failed to save service');
+      }
       onNavigate('services');
-    }, 1000);
+    } catch (err) {
+      // @ts-ignore
+      alert(err?.message || 'An error occurred while saving the service');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCancel = () => {
