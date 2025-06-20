@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Eye, Trash2, Mail } from 'lucide-react';
-import { Screen } from '../../App';
-
-interface ContactsManagementProps {
-  onNavigate: (screen: Screen, item?: any) => void;
-}
+import { useNavigate } from 'react-router-dom';
 
 interface Contact {
   id: number;
@@ -15,12 +11,13 @@ interface Contact {
   message: string;
 }
 
-export default function ContactsManagement({ onNavigate }: ContactsManagementProps) {
+export default function ContactsManagement() {
   const [searchTerm, setSearchTerm] = useState('');
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewContact, setViewContact] = useState<Contact | null>(null);
   const [viewLoading, setViewLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchContacts = async () => {
@@ -60,17 +57,7 @@ export default function ContactsManagement({ onNavigate }: ContactsManagementPro
   };
 
   const handleView = async (id: number) => {
-    setViewLoading(true);
-    setViewContact(null);
-    try {
-      const response = await fetch(`https://api.thaneforestdivision.com/api/contacts/${id}/`);
-      const data = await response.json();
-      setViewContact(data);
-    } catch (error) {
-      alert('Failed to load contact details.');
-    } finally {
-      setViewLoading(false);
-    }
+    navigate(`/contact-view/${id}`);
   };
 
   if (loading) {
@@ -89,12 +76,7 @@ export default function ContactsManagement({ onNavigate }: ContactsManagementPro
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Contacts Management</h1>
-          <p className="text-slate-600 mt-1">Manage incoming contact messages</p>
-        </div>
-        <div className="flex items-center space-x-4">
-          <div className="text-sm bg-blue-50 text-blue-600 px-3 py-1 rounded-full">
-            {contacts.length} total messages
-          </div>
+          <p className="text-slate-600 mt-1">Manage your contacts</p>
         </div>
       </div>
 
@@ -112,7 +94,7 @@ export default function ContactsManagement({ onNavigate }: ContactsManagementPro
             />
           </div>
           <div className="text-sm text-slate-600">
-            {filteredContacts.length} messages found
+            {filteredContacts.length} contacts found
           </div>
         </div>
       </div>
@@ -123,9 +105,9 @@ export default function ContactsManagement({ onNavigate }: ContactsManagementPro
           <table className="w-full">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="text-left py-3 px-6 font-medium text-slate-900">Sender</th>
+                <th className="text-left py-3 px-6 font-medium text-slate-900">Name</th>
+                <th className="text-left py-3 px-6 font-medium text-slate-900">Email</th>
                 <th className="text-left py-3 px-6 font-medium text-slate-900">Subject</th>
-                <th className="text-left py-3 px-6 font-medium text-slate-900">Phone</th>
                 <th className="text-left py-3 px-6 font-medium text-slate-900">Actions</th>
               </tr>
             </thead>
@@ -133,27 +115,17 @@ export default function ContactsManagement({ onNavigate }: ContactsManagementPro
               {filteredContacts.map((contact, index) => (
                 <tr key={contact.id} className={`border-b border-slate-200 hover:bg-slate-50 ${index % 2 === 0 ? 'bg-white' : 'bg-slate-25'}`}>
                   <td className="py-4 px-6">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                        <Mail className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <div className="font-medium text-slate-900">{contact.name}</div>
-                        <div className="text-sm text-slate-600">{contact.email}</div>
-                      </div>
-                    </div>
+                    <div className="font-medium text-slate-900">{contact.name}</div>
                   </td>
                   <td className="py-4 px-6">
-                    <div className="font-medium text-slate-900 max-w-md truncate">{contact.subject}</div>
-                    <div className="text-sm text-slate-600 max-w-md truncate">{contact.message}</div>
+                    <div className="text-slate-600">{contact.email}</div>
                   </td>
                   <td className="py-4 px-6">
-                    <div className="text-slate-600">{contact.phone}</div>
+                    <div className="text-slate-600">{contact.subject}</div>
                   </td>
                   <td className="py-4 px-6">
                     <div className="flex items-center space-x-2">
-                      <button
-                        className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                      <button className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                         onClick={() => handleView(contact.id)}
                       >
                         <Eye className="w-4 h-4" />
@@ -171,32 +143,6 @@ export default function ContactsManagement({ onNavigate }: ContactsManagementPro
           </table>
         </div>
       </div>
-
-      {/* Contact Detail Modal */}
-      {viewContact && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-8 shadow-xl max-w-md w-full relative">
-            <button
-              className="absolute top-2 right-2 text-slate-500 hover:text-slate-700"
-              onClick={() => setViewContact(null)}
-            >
-              &times;
-            </button>
-            {viewLoading ? (
-              <div className="text-center text-slate-600">Loading...</div>
-            ) : (
-              <>
-                <h2 className="text-xl font-bold text-slate-900 mb-2">{viewContact.name}</h2>
-                <div className="text-slate-600 mb-2">ID: {viewContact.id}</div>
-                <div className="mb-2 text-slate-700">Email: {viewContact.email}</div>
-                <div className="mb-2 text-slate-700">Phone: {viewContact.phone}</div>
-                <div className="mb-2 text-slate-700">Subject: {viewContact.subject}</div>
-                <div className="mb-4 text-slate-700">Message: {viewContact.message}</div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

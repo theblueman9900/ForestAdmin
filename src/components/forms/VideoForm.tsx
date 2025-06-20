@@ -1,17 +1,24 @@
-import React, { useState } from 'react';
-import { ArrowLeft, Upload, X, Video } from 'lucide-react';
-import { Screen } from '../../App';
+import React, { useState, useEffect } from 'react';
+import { ArrowLeft, Upload, X, Video as VideoIcon } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
 
-interface VideoFormProps {
-  onNavigate: (screen: Screen) => void;
-  editingItem?: any;
-}
-
-export default function VideoForm({ onNavigate, editingItem }: VideoFormProps) {
-  const [name, setName] = useState(editingItem?.name || '');
+export default function VideoForm() {
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const [name, setName] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (id) {
+      fetch(`https://api.thaneforestdivision.com/api/videos/${id}/`)
+        .then(res => res.json())
+        .then(data => {
+          setName(data.name || '');
+        });
+    }
+  }, [id]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -28,14 +35,12 @@ export default function VideoForm({ onNavigate, editingItem }: VideoFormProps) {
     try {
       const formData = new FormData();
       formData.append('name', name);
-      
       if (selectedFile) {
         formData.append('video', selectedFile);
       }
-
       let response;
-      if (editingItem) {
-        response = await fetch(`https://api.thaneforestdivision.com/api/videos/${editingItem.id}/`, {
+      if (id) {
+        response = await fetch(`https://api.thaneforestdivision.com/api/videos/${id}/`, {
           method: 'PUT',
           body: formData,
         });
@@ -45,12 +50,10 @@ export default function VideoForm({ onNavigate, editingItem }: VideoFormProps) {
           body: formData,
         });
       }
-
       if (!response.ok) {
         throw new Error('Failed to save video');
       }
-
-      onNavigate('videos');
+      navigate('/videos');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred while saving the video');
     } finally {
@@ -59,7 +62,7 @@ export default function VideoForm({ onNavigate, editingItem }: VideoFormProps) {
   };
 
   const handleCancel = () => {
-    onNavigate('videos');
+    navigate('/videos');
   };
 
   return (
@@ -67,17 +70,17 @@ export default function VideoForm({ onNavigate, editingItem }: VideoFormProps) {
       {/* Header */}
       <div className="flex items-center space-x-4 mb-6">
         <button
-          onClick={() => onNavigate('videos')}
+          onClick={handleCancel}
           className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
         >
           <ArrowLeft className="w-5 h-5 text-slate-600" />
         </button>
         <div>
           <h1 className="text-2xl font-bold text-slate-900">
-            {editingItem ? 'Edit Video' : 'Add New Video'}
+            {id ? 'Edit Video' : 'Add New Video'}
           </h1>
           <p className="text-slate-600 mt-1">
-            {editingItem ? 'Update video details' : 'Upload a new video'}
+            {id ? 'Update video details' : 'Upload a new video'}
           </p>
         </div>
       </div>
@@ -103,80 +106,33 @@ export default function VideoForm({ onNavigate, editingItem }: VideoFormProps) {
 
           {/* File Upload */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              Video File {!editingItem && '*'}
-            </label>
-            <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
-              <input
-                type="file"
-                accept="video/*"
-                onChange={handleFileSelect}
-                className="hidden"
-                id="video-upload"
-                required={!editingItem}
-              />
-              <label
-                htmlFor="video-upload"
-                className="cursor-pointer flex flex-col items-center space-y-2"
-              >
-                <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center">
-                  <Upload className="w-6 h-6 text-red-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-slate-700">
-                    Click to upload a video file
-                  </p>
-                  <p className="text-xs text-slate-500">
-                    MP4, MOV, AVI up to 100MB
-                  </p>
-                </div>
-              </label>
-
-              {selectedFile && (
-                <div className="mt-4 flex items-center justify-center space-x-2">
-                  <Video className="w-4 h-4 text-green-600" />
-                  <span className="text-sm text-slate-700">{selectedFile.name}</span>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedFile(null)}
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              )}
-            </div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Video File *</label>
+            <input
+              type="file"
+              accept="video/*"
+              onChange={handleFileSelect}
+              className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+            />
           </div>
 
-          {/* Error Message */}
-          {error && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-sm text-red-600">{error}</p>
-            </div>
-          )}
+          {/* Error */}
+          {error && <div className="text-red-600 text-sm">{error}</div>}
 
-          {/* Form Actions */}
-          <div className="flex items-center justify-end space-x-4 pt-6 border-t border-slate-200">
-            <button
-              type="button"
-              onClick={handleCancel}
-              className="px-6 py-2 text-slate-600 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
-            >
-              Cancel
-            </button>
+          {/* Actions */}
+          <div className="flex space-x-2">
             <button
               type="submit"
               disabled={isLoading}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
             >
-              {isLoading ? (
-                <div className="flex items-center space-x-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Uploading...</span>
-                </div>
-              ) : (
-                'Save Video'
-              )}
+              {isLoading ? 'Saving...' : id ? 'Update Video' : 'Add Video'}
+            </button>
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="bg-slate-200 text-slate-700 px-4 py-2 rounded-lg hover:bg-slate-300 transition-colors"
+            >
+              Cancel
             </button>
           </div>
         </form>

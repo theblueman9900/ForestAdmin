@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, Edit, Trash2, Eye } from 'lucide-react';
-import { Screen } from '../../App';
-
-interface ImagesManagementProps {
-  onNavigate: (screen: Screen, item?: any) => void;
-}
+import { useNavigate } from 'react-router-dom';
 
 interface Image {
   id: number;
@@ -12,13 +8,14 @@ interface Image {
   photo: string;
 }
 
-export default function ImagesManagement({ onNavigate }: ImagesManagementProps) {
+export default function ImagesManagement() {
   const [searchTerm, setSearchTerm] = useState('');
   const [images, setImages] = useState<Image[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [viewImage, setViewImage] = useState<Image | null>(null);
   const [viewLoading, setViewLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchImages = async () => {
@@ -122,7 +119,7 @@ export default function ImagesManagement({ onNavigate }: ImagesManagementProps) 
             Delete Selected
           </button>
           <button
-            onClick={() => onNavigate('image-form')}
+            onClick={() => navigate('/image-form')}
             className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-4 h-4" />
@@ -198,7 +195,7 @@ export default function ImagesManagement({ onNavigate }: ImagesManagementProps) 
                         <Eye className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => onNavigate('image-form', image)}
+                        onClick={() => navigate(`/image-form/${image.id}`)}
                         className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                       >
                         <Edit className="w-4 h-4" />

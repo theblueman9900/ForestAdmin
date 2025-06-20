@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, Edit, Trash2, Play, ExternalLink, Eye } from 'lucide-react';
-import { Screen } from '../../App';
-
-interface VideosManagementProps {
-  onNavigate: (screen: Screen, item?: any) => void;
-}
+import { useNavigate } from 'react-router-dom';
 
 interface Video {
   id: number;
@@ -12,13 +8,14 @@ interface Video {
   video: string;
 }
 
-export default function VideosManagement({ onNavigate }: VideosManagementProps) {
+export default function VideosManagement() {
   const [searchTerm, setSearchTerm] = useState('');
   const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [viewVideo, setViewVideo] = useState<Video | null>(null);
   const [viewLoading, setViewLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchVideos = async () => {
@@ -122,7 +119,7 @@ export default function VideosManagement({ onNavigate }: VideosManagementProps) 
             Delete Selected
           </button>
           <button
-            onClick={() => onNavigate('video-form')}
+            onClick={() => navigate('/video-form')}
             className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-4 h-4" />
@@ -209,7 +206,7 @@ export default function VideosManagement({ onNavigate }: VideosManagementProps) 
                         <Eye className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => onNavigate('video-form', video)}
+                        onClick={() => navigate(`/video-form/${video.id}`)}
                         className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                       >
                         <Edit className="w-4 h-4" />

@@ -1,30 +1,13 @@
 import React from 'react';
 import { Search, Bell, User, ChevronDown, Menu, LogOut } from 'lucide-react';
-import { Screen } from '../App';
 
 interface HeaderProps {
   onMenuToggle: () => void;
   isMenuCollapsed: boolean;
-  currentScreen: Screen;
   onLogout: () => void;
 }
 
-export default function Header({ onMenuToggle, isMenuCollapsed, currentScreen, onLogout }: HeaderProps) {
-  const getScreenTitle = (screen: Screen) => {
-    switch (screen) {
-      case 'dashboard': return 'Dashboard';
-      case 'images': return 'Images Management';
-      case 'videos': return 'Videos Management';
-      case 'services': return 'Services Management';
-      case 'contacts': return 'Contacts Management';
-      case 'image-form': return 'Image Form';
-      case 'video-form': return 'Video Form';
-      case 'service-form': return 'Service Form';
-      case 'contact-view': return 'Contact Details';
-      default: return 'Dashboard';
-    }
-  };
-
+export default function Header({ onMenuToggle, isMenuCollapsed, onLogout }: HeaderProps) {
   return (
     <header className={`fixed top-0 right-0 h-16 bg-white border-b border-slate-200 z-40 transition-all duration-300 ${
       isMenuCollapsed ? 'left-16' : 'left-64'
@@ -38,11 +21,8 @@ export default function Header({ onMenuToggle, isMenuCollapsed, currentScreen, o
           >
             <Menu className="w-5 h-5 text-slate-600" />
           </button>
-          
           <div className="flex items-center space-x-2 text-sm text-slate-600">
             <span>Admin Portal</span>
-            <span>/</span>
-            <span className="text-slate-900 font-medium">{getScreenTitle(currentScreen)}</span>
           </div>
         </div>
 

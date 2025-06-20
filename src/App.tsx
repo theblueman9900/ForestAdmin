@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import Dashboard from './components/screens/Dashboard';
@@ -25,17 +26,10 @@ export type Screen =
 
 function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [currentScreen, setCurrentScreen] = useState<Screen>('dashboard');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [editingItem, setEditingItem] = useState<any>(null);
 
   const toggleSidebar = () => {
     setSidebarCollapsed(!sidebarCollapsed);
-  };
-
-  const navigateToScreen = (screen: Screen, item?: any) => {
-    setCurrentScreen(screen);
-    setEditingItem(item || null);
   };
 
   const handleLogin = () => {
@@ -44,58 +38,31 @@ function App() {
 
   const handleLogout = () => {
     setIsLoggedIn(false);
-    setCurrentScreen('dashboard');
   };
 
   if (!isLoggedIn) {
     return <Login onLogin={handleLogin} />;
   }
 
-  const renderScreen = () => {
-    switch (currentScreen) {
-      case 'dashboard':
-        return <Dashboard />;
-      case 'images':
-        return <ImagesManagement onNavigate={navigateToScreen} />;
-      case 'videos':
-        return <VideosManagement onNavigate={navigateToScreen} />;
-      case 'services':
-        return <ServicesManagement onNavigate={navigateToScreen} />;
-      case 'contacts':
-        return <ContactsManagement onNavigate={navigateToScreen} />;
-      case 'image-form':
-        return <ImageForm onNavigate={navigateToScreen} editingItem={editingItem} />;
-      case 'video-form':
-        return <VideoForm onNavigate={navigateToScreen} editingItem={editingItem} />;
-      case 'service-form':
-        return <ServiceForm onNavigate={navigateToScreen} editingItem={editingItem} />;
-      case 'contact-view':
-        return <ContactView onNavigate={navigateToScreen} contact={editingItem} />;
-      default:
-        return <Dashboard />;
-    }
-  };
-
   return (
     <div className="min-h-screen bg-slate-50">
-      <Sidebar 
-        isCollapsed={sidebarCollapsed} 
-        onToggle={toggleSidebar}
-        currentScreen={currentScreen}
-        onNavigate={navigateToScreen}
-      />
-      
-      <Header 
-        onMenuToggle={toggleSidebar} 
-        isMenuCollapsed={sidebarCollapsed}
-        currentScreen={currentScreen}
-        onLogout={handleLogout}
-      />
-      
-      <main className={`transition-all duration-300 pt-16 ${
-        sidebarCollapsed ? 'ml-16' : 'ml-64'
-      }`}>
-        {renderScreen()}
+      <Sidebar isCollapsed={sidebarCollapsed} onToggle={toggleSidebar} />
+      <Header onMenuToggle={toggleSidebar} isMenuCollapsed={sidebarCollapsed} onLogout={handleLogout} />
+      <main className={`transition-all duration-300 pt-16 ${sidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/images" element={<ImagesManagement />} />
+          <Route path="/videos" element={<VideosManagement />} />
+          <Route path="/services" element={<ServicesManagement />} />
+          <Route path="/contacts" element={<ContactsManagement />} />
+          <Route path="/image-form" element={<ImageForm />} />
+          <Route path="/image-form/:id" element={<ImageForm />} />
+          <Route path="/video-form" element={<VideoForm />} />
+          <Route path="/video-form/:id" element={<VideoForm />} />
+          <Route path="/service-form" element={<ServiceForm />} />
+          <Route path="/service-form/:id" element={<ServiceForm />} />
+          <Route path="/contact-view/:id" element={<ContactView />} />
+        </Routes>
       </main>
     </div>
   );

@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, Edit, Trash2, FileText, Eye } from 'lucide-react';
-import { Screen } from '../../App';
-
-interface ServicesManagementProps {
-  onNavigate: (screen: Screen, item?: any) => void;
-}
+import { useNavigate } from 'react-router-dom';
 
 interface Service {
   id: number;
@@ -13,13 +9,14 @@ interface Service {
   file: string;
 }
 
-export default function ServicesManagement({ onNavigate }: ServicesManagementProps) {
+export default function ServicesManagement() {
   const [searchTerm, setSearchTerm] = useState('');
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [viewService, setViewService] = useState<Service | null>(null);
   const [viewLoading, setViewLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -124,7 +121,7 @@ export default function ServicesManagement({ onNavigate }: ServicesManagementPro
             Delete Selected
           </button>
           <button
-            onClick={() => onNavigate('service-form')}
+            onClick={() => navigate('/service-form')}
             className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-4 h-4" />
@@ -208,7 +205,7 @@ export default function ServicesManagement({ onNavigate }: ServicesManagementPro
                         <Eye className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => onNavigate('service-form', service)}
+                        onClick={() => navigate(`/service-form/${service.id}`)}
                         className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                       >
                         <Edit className="w-4 h-4" />

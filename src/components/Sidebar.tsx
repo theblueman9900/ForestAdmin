@@ -8,23 +8,24 @@ import {
   ChevronRight,
   Building2
 } from 'lucide-react';
-import { Screen } from '../App';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface SidebarProps {
   isCollapsed: boolean;
   onToggle: () => void;
-  currentScreen: Screen;
-  onNavigate: (screen: Screen) => void;
 }
 
-export default function Sidebar({ isCollapsed, onToggle, currentScreen, onNavigate }: SidebarProps) {
-  const navigationItems = [
-    { icon: LayoutDashboard, label: 'Dashboard', screen: 'dashboard' as Screen },
-    { icon: Image, label: 'Images', screen: 'images' as Screen },
-    { icon: Video, label: 'Videos', screen: 'videos' as Screen },
-    { icon: Briefcase, label: 'Services', screen: 'services' as Screen },
-    { icon: Mail, label: 'Contacts', screen: 'contacts' as Screen },
-  ];
+const navigationItems = [
+  { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
+  { icon: Image, label: 'Images', path: '/images' },
+  { icon: Video, label: 'Videos', path: '/videos' },
+  { icon: Briefcase, label: 'Services', path: '/services' },
+  { icon: Mail, label: 'Contacts', path: '/contacts' },
+];
+
+export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
+  const navigate = useNavigate();
+  const location = useLocation();
 
   return (
     <div className={`fixed left-0 top-0 h-full bg-gradient-to-b from-slate-900 to-slate-800 border-r border-slate-700 transition-all duration-300 z-50 ${
@@ -55,25 +56,28 @@ export default function Sidebar({ isCollapsed, onToggle, currentScreen, onNaviga
       {/* Navigation */}
       <div className="flex-1 overflow-y-auto py-4">
         <ul className="space-y-1 px-2">
-          {navigationItems.map((item, index) => (
-            <li key={index}>
-              <button
-                onClick={() => onNavigate(item.screen)}
-                className={`w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group ${
-                  currentScreen === item.screen
-                    ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/25'
-                    : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'
-                }`}
-              >
-                <item.icon className={`w-5 h-5 ${isCollapsed ? 'mx-auto' : 'mr-3'} ${
-                  currentScreen === item.screen ? 'text-white' : 'text-slate-400 group-hover:text-white'
-                }`} />
-                {!isCollapsed && (
-                  <span className="flex-1 text-left">{item.label}</span>
-                )}
-              </button>
-            </li>
-          ))}
+          {navigationItems.map((item, index) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <li key={index}>
+                <button
+                  onClick={() => navigate(item.path)}
+                  className={`w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group ${
+                    isActive
+                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/25'
+                      : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'
+                  }`}
+                >
+                  <item.icon className={`w-5 h-5 ${isCollapsed ? 'mx-auto' : 'mr-3'} ${
+                    isActive ? 'text-white' : 'text-slate-400 group-hover:text-white'
+                  }`} />
+                  {!isCollapsed && (
+                    <span className="flex-1 text-left">{item.label}</span>
+                  )}
+                </button>
+              </li>
+            );
+          })}
         </ul>
       </div>
 

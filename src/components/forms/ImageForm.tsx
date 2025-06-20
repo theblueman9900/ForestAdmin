@@ -1,18 +1,27 @@
-import React, { useState } from 'react';
-import { ArrowLeft, Upload, X, Image } from 'lucide-react';
-import { Screen } from '../../App';
+import React, { useState, useEffect } from 'react';
+import { ArrowLeft, Upload, X, Image as ImageIcon } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
 
-interface ImageFormProps {
-  onNavigate: (screen: Screen) => void;
-  editingItem?: any;
-}
-
-export default function ImageForm({ onNavigate, editingItem }: ImageFormProps) {
-  const [title, setTitle] = useState(editingItem?.name || '');
+export default function ImageForm() {
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const [title, setTitle] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState(editingItem?.photo || '');
+  const [previewUrl, setPreviewUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (id) {
+      // Fetch image details for editing
+      fetch(`https://api.thaneforestdivision.com/api/photos/${id}/`)
+        .then(res => res.json())
+        .then(data => {
+          setTitle(data.name || '');
+          setPreviewUrl(data.photo || '');
+        });
+    }
+  }, [id]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -34,14 +43,12 @@ export default function ImageForm({ onNavigate, editingItem }: ImageFormProps) {
     try {
       const formData = new FormData();
       formData.append('name', title);
-      
       if (selectedFile) {
         formData.append('photo', selectedFile);
       }
-
       let response;
-      if (editingItem) {
-        response = await fetch(`https://api.thaneforestdivision.com/api/photos/${editingItem.id}/`, {
+      if (id) {
+        response = await fetch(`https://api.thaneforestdivision.com/api/photos/${id}/`, {
           method: 'PUT',
           body: formData,
         });
@@ -51,12 +58,10 @@ export default function ImageForm({ onNavigate, editingItem }: ImageFormProps) {
           body: formData,
         });
       }
-
       if (!response.ok) {
         throw new Error('Failed to save image');
       }
-
-      onNavigate('images');
+      navigate('/images');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred while saving the image');
     } finally {
@@ -65,7 +70,7 @@ export default function ImageForm({ onNavigate, editingItem }: ImageFormProps) {
   };
 
   const handleCancel = () => {
-    onNavigate('images');
+    navigate('/images');
   };
 
   return (
@@ -73,17 +78,17 @@ export default function ImageForm({ onNavigate, editingItem }: ImageFormProps) {
       {/* Header */}
       <div className="flex items-center space-x-4 mb-6">
         <button
-          onClick={() => onNavigate('images')}
+          onClick={handleCancel}
           className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
         >
           <ArrowLeft className="w-5 h-5 text-slate-600" />
         </button>
         <div>
           <h1 className="text-2xl font-bold text-slate-900">
-            {editingItem ? 'Edit Image' : 'Add New Image'}
+            {id ? 'Edit Image' : 'Add New Image'}
           </h1>
           <p className="text-slate-600 mt-1">
-            {editingItem ? 'Update image details' : 'Upload and configure a new image'}
+            {id ? 'Update image details' : 'Upload a new image'}
           </p>
         </div>
       </div>
@@ -91,13 +96,13 @@ export default function ImageForm({ onNavigate, editingItem }: ImageFormProps) {
       {/* Form */}
       <div className="bg-white rounded-xl border border-slate-200 p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Image Title */}
+          {/* Image Name */}
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-slate-700 mb-2">
+            <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-2">
               Image Name *
             </label>
             <input
-              id="title"
+              id="name"
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -109,96 +114,38 @@ export default function ImageForm({ onNavigate, editingItem }: ImageFormProps) {
 
           {/* File Upload */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              Image File {!editingItem && '*'}
-            </label>
-            
-            {/* Preview */}
-            {previewUrl && (
-              <div className="mb-4">
-                <img
-                  src={previewUrl}
-                  alt="Preview"
-                  className="w-48 h-32 object-cover rounded-lg border border-slate-200"
-                />
-              </div>
-            )}
-
-            {/* File Input */}
-            <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
+            <label className="block text-sm font-medium text-slate-700 mb-2">Image File *</label>
+            <div className="flex items-center space-x-4">
               <input
                 type="file"
                 accept="image/*"
                 onChange={handleFileSelect}
-                className="hidden"
-                id="file-upload"
-                required={!editingItem}
+                className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
               />
-              <label
-                htmlFor="file-upload"
-                className="cursor-pointer flex flex-col items-center space-y-2"
-              >
-                <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center">
-                  <Upload className="w-6 h-6 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-slate-700">
-                    Click to upload an image
-                  </p>
-                  <p className="text-xs text-slate-500">
-                    PNG, JPG, GIF up to 10MB
-                  </p>
-                </div>
-              </label>
+              {previewUrl && (
+                <img src={previewUrl} alt="Preview" className="w-16 h-16 object-cover rounded border" />
+              )}
             </div>
-
-            {selectedFile && (
-              <div className="mt-2 flex items-center space-x-2">
-                <Image className="w-4 h-4 text-green-600" />
-                <span className="text-sm text-slate-700">{selectedFile.name}</span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedFile(null);
-                    setPreviewUrl(editingItem?.photo || '');
-                  }}
-                  className="text-red-600 hover:text-red-700"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            )}
           </div>
 
-          {/* Error Message */}
-          {error && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-sm text-red-600">{error}</p>
-            </div>
-          )}
+          {/* Error */}
+          {error && <div className="text-red-600 text-sm">{error}</div>}
 
-          {/* Form Actions */}
-          <div className="flex items-center justify-end space-x-4 pt-6 border-t border-slate-200">
-            <button
-              type="button"
-              onClick={handleCancel}
-              className="px-6 py-2 text-slate-600 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
-            >
-              Cancel
-            </button>
+          {/* Actions */}
+          <div className="flex space-x-2">
             <button
               type="submit"
               disabled={isLoading}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
             >
-              {isLoading ? (
-                <div className="flex items-center space-x-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Uploading...</span>
-                </div>
-              ) : (
-                'Save Image'
-              )}
+              {isLoading ? 'Saving...' : id ? 'Update Image' : 'Add Image'}
+            </button>
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="bg-slate-200 text-slate-700 px-4 py-2 rounded-lg hover:bg-slate-300 transition-colors"
+            >
+              Cancel
             </button>
           </div>
         </form>
