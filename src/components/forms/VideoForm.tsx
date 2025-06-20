@@ -33,18 +33,26 @@ export default function VideoForm({ onNavigate, editingItem }: VideoFormProps) {
         formData.append('video', selectedFile);
       }
 
-      const response = await fetch('https://api.thaneforestdivision.com/api/videos/', {
-        method: 'POST',
-        body: formData,
-      });
+      let response;
+      if (editingItem) {
+        response = await fetch(`https://api.thaneforestdivision.com/api/videos/${editingItem.id}/`, {
+          method: 'PUT',
+          body: formData,
+        });
+      } else {
+        response = await fetch('https://api.thaneforestdivision.com/api/videos/', {
+          method: 'POST',
+          body: formData,
+        });
+      }
 
       if (!response.ok) {
-        throw new Error('Failed to upload video');
+        throw new Error('Failed to save video');
       }
 
       onNavigate('videos');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred while uploading the video');
+      setError(err instanceof Error ? err.message : 'An error occurred while saving the video');
     } finally {
       setIsLoading(false);
     }
