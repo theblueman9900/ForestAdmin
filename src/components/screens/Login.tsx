@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { User, Lock, Eye, EyeOff, Building2 } from 'lucide-react';
 
 interface LoginProps {
-  onLogin: () => void;
+  onLogin: (email: string, password: string) => Promise<void>;
 }
 
 export default function Login({ onLogin }: LoginProps) {
@@ -10,16 +10,19 @@ export default function Login({ onLogin }: LoginProps) {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
-    // Simulate login process
-    setTimeout(() => {
+    setError(null);
+    try {
+      await onLogin(email, password);
+    } catch (err) {
+      setError('Login failed. Please check your credentials.');
+    } finally {
       setIsLoading(false);
-      onLogin();
-    }, 1000);
+    }
   };
 
   return (
@@ -81,6 +84,9 @@ export default function Login({ onLogin }: LoginProps) {
                 </button>
               </div>
             </div>
+
+            {/* Error */}
+            {error && <div className="text-red-600 text-sm">{error}</div>}
 
             {/* Login Button */}
             <button

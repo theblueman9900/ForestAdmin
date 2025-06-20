@@ -26,18 +26,41 @@ export type Screen =
 
 function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    return sessionStorage.getItem('isLoggedIn') === 'true' && !!sessionStorage.getItem('token');
+  });
 
   const toggleSidebar = () => {
     setSidebarCollapsed(!sidebarCollapsed);
   };
 
-  const handleLogin = () => {
-    setIsLoggedIn(true);
+  // Simulate login API call
+  const loginApi = async (email: string, password: string): Promise<{ token: string }> => {
+    // Replace this with your real API call
+    // Example: const response = await fetch('/api/login', ...)
+    // For now, always succeed and return a fake token
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({ token: 'fake-jwt-token-123' });
+      }, 800);
+    });
+  };
+
+  const handleLogin = async (email: string, password: string): Promise<void> => {
+    const result = await loginApi(email, password);
+    if (result && result.token) {
+      setIsLoggedIn(true);
+      sessionStorage.setItem('isLoggedIn', 'true');
+      sessionStorage.setItem('token', result.token);
+    } else {
+      throw new Error('Login failed');
+    }
   };
 
   const handleLogout = () => {
     setIsLoggedIn(false);
+    sessionStorage.removeItem('isLoggedIn');
+    sessionStorage.removeItem('token');
   };
 
   if (!isLoggedIn) {
