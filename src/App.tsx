@@ -69,7 +69,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
       <Sidebar isCollapsed={sidebarCollapsed} onToggle={toggleSidebar} />
       <Header onMenuToggle={toggleSidebar} isMenuCollapsed={sidebarCollapsed} onLogout={handleLogout} />
       <main className={`transition-all duration-300 pt-16 ${sidebarCollapsed ? 'ml-16' : 'ml-64'}`}>

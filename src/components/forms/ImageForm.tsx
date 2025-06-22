@@ -91,7 +91,7 @@ export default function ImageForm() {
   if (isLoading) {
     return (
       <div className="p-6">
-        <div className="text-center text-slate-600">Loading form...</div>
+        <div className="text-center text-slate-600 dark:text-slate-300">Loading form...</div>
       </div>
     );
   }
@@ -102,24 +102,24 @@ export default function ImageForm() {
       <div className="flex items-center space-x-4 mb-6">
         <button
           onClick={handleCancel}
-          className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+          className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
         >
-          <ArrowLeft className="w-5 h-5 text-slate-600" />
+          <ArrowLeft className="w-5 h-5 text-slate-600 dark:text-slate-300" />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
             {id ? 'Edit Image' : 'Add New Image'}
           </h1>
-          <p className="text-slate-600 mt-1">
+          <p className="text-slate-600 dark:text-slate-400 mt-1">
             {id ? 'Update image details' : 'Upload a new image'}
           </p>
         </div>
       </div>
 
       {/* Form */}
-      <div className="bg-white rounded-xl border border-slate-200 p-6">
+      <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
         {error && !isSubmitting && (
-          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
+          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 dark:bg-red-900/20 dark:border-red-700 dark:text-red-400 p-4 mb-6" role="alert">
             <p className="font-bold">Error</p>
             <p>{error}</p>
           </div>
@@ -127,7 +127,7 @@ export default function ImageForm() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Image Name */}
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-2">
+            <label htmlFor="name" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
               Image Name *
             </label>
             <input
@@ -136,29 +136,29 @@ export default function ImageForm() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Enter image name"
-              className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-slate-200 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100"
               required
             />
           </div>
 
           {/* File Upload */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Image File *</label>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Image File *</label>
             <div className="flex items-center space-x-4">
               <input
                 type="file"
                 accept="image/*"
                 onChange={handleFileSelect}
-                className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-slate-700 dark:file:text-slate-300 dark:hover:file:bg-slate-600"
               />
               {previewUrl && (
-                <img src={previewUrl} alt="Preview" className="w-16 h-16 object-cover rounded border" />
+                <img src={previewUrl} alt="Preview" className="w-16 h-16 object-cover rounded border dark:border-slate-600" />
               )}
             </div>
           </div>
 
           {/* Error for submission */}
-          {error && isSubmitting && <div className="text-red-600 text-sm">{error}</div>}
+          {error && isSubmitting && <div className="text-red-600 dark:text-red-400 text-sm">{error}</div>}
 
           {/* Actions */}
           <div className="flex space-x-2">
@@ -172,7 +172,7 @@ export default function ImageForm() {
             <button
               type="button"
               onClick={handleCancel}
-              className="bg-slate-200 text-slate-700 px-4 py-2 rounded-lg hover:bg-slate-300 transition-colors"
+              className="bg-slate-200 text-slate-700 px-4 py-2 rounded-lg hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600 transition-colors"
             >
               Cancel
             </button>

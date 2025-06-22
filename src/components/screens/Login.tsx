@@ -39,11 +39,11 @@ export default function Login({ onLogin }: LoginProps) {
         </div>
 
         {/* Login Form */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Email Address
               </label>
               <div className="relative">
@@ -54,7 +54,7 @@ export default function Login({ onLogin }: LoginProps) {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
-                  className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  className="w-full pl-10 pr-4 py-3 border border-slate-200 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100"
                   required
                 />
               </div>
@@ -62,7 +62,7 @@ export default function Login({ onLogin }: LoginProps) {
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Password
               </label>
               <div className="relative">
@@ -73,13 +73,13 @@ export default function Login({ onLogin }: LoginProps) {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="w-full pl-10 pr-12 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  className="w-full pl-10 pr-12 py-3 border border-slate-200 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -87,7 +87,7 @@ export default function Login({ onLogin }: LoginProps) {
             </div>
 
             {/* Error */}
-            {error && <div className="text-red-600 text-sm">{error}</div>}
+            {error && <div className="text-red-600 dark:text-red-400 text-sm">{error}</div>}
 
             {/* Login Button */}
             <button
@@ -107,10 +107,10 @@ export default function Login({ onLogin }: LoginProps) {
           </form>
 
           {/* Demo Credentials */}
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-            <p className="text-sm text-blue-700 font-medium mb-2">Demo Credentials:</p>
-            <p className="text-xs text-blue-600">Email: admin@example.com</p>
-            <p className="text-xs text-blue-600">Password: password123</p>
+          <div className="mt-6 p-4 bg-blue-50 dark:bg-slate-700 rounded-lg">
+            <p className="text-sm text-blue-700 dark:text-blue-300 font-medium mb-2">Demo Credentials:</p>
+            <p className="text-xs text-blue-600 dark:text-blue-400">Email: admin@example.com</p>
+            <p className="text-xs text-blue-600 dark:text-blue-400">Password: password123</p>
           </div>
         </div>
 

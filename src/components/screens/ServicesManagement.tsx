@@ -141,8 +141,8 @@ export default function ServicesManagement() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Services Management</h1>
-          <p className="text-slate-600 mt-1">Manage your service offerings</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Services Management</h1>
+          <p className="text-slate-600 dark:text-slate-400 mt-1">Manage your service offerings</p>
         </div>
         <div className="flex items-center space-x-2">
           <button
@@ -163,14 +163,14 @@ export default function ServicesManagement() {
       </div>
 
       {deleteError && (
-        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
+        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 dark:bg-red-900/20 dark:border-red-700 dark:text-red-400 p-4 mb-6" role="alert">
           <p className="font-bold">Delete Error</p>
           <p>{deleteError}</p>
         </div>
       )}
 
       {/* Search and Filters */}
-      <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6">
+      <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6 mb-6">
         <div className="flex items-center space-x-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -179,51 +179,51 @@ export default function ServicesManagement() {
               placeholder="Search services..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 border border-slate-200 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100"
             />
           </div>
-          <div className="text-sm text-slate-600">
+          <div className="text-sm text-slate-600 dark:text-slate-400">
             {filteredServices.length} services found
           </div>
         </div>
       </div>
 
       {/* Services Table */}
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-slate-50 border-b border-slate-200">
+            <thead className="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-200 dark:border-slate-700">
               <tr>
                 <th className="py-3 px-4 text-center">
                   <input
                     type="checkbox"
-                    className="form-checkbox h-5 w-5 text-blue-600 rounded focus:ring-blue-500 border-slate-300"
+                    className="form-checkbox h-5 w-5 text-blue-600 rounded focus:ring-blue-500 border-slate-300 dark:border-slate-500 bg-white dark:bg-slate-700 focus:ring-offset-slate-800"
                     checked={selectedIds.length === filteredServices.length && filteredServices.length > 0}
                     onChange={handleSelectAll}
                   />
                 </th>
-                <th className="text-left py-3 px-6 font-medium text-slate-900">Service Title</th>
-                <th className="text-left py-3 px-6 font-medium text-slate-900">Description</th>
-                <th className="text-left py-3 px-6 font-medium text-slate-900">File</th>
-                <th className="text-left py-3 px-6 font-medium text-slate-900">Actions</th>
+                <th className="text-left py-3 px-6 font-medium text-slate-900 dark:text-slate-100">Service Title</th>
+                <th className="text-left py-3 px-6 font-medium text-slate-900 dark:text-slate-100">Description</th>
+                <th className="text-left py-3 px-6 font-medium text-slate-900 dark:text-slate-100">File</th>
+                <th className="text-left py-3 px-6 font-medium text-slate-900 dark:text-slate-100">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredServices.map((service, index) => (
-                <tr key={service.id} className={`border-b border-slate-200 hover:bg-slate-50 ${selectedIds.includes(service.id) ? 'bg-blue-50' : index % 2 === 0 ? 'bg-white' : 'bg-slate-25'}`}> 
+                <tr key={service.id} className={`border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 ${selectedIds.includes(service.id) ? 'bg-blue-50 dark:bg-blue-900/20' : index % 2 === 0 ? 'bg-white dark:bg-slate-800' : 'bg-slate-25 dark:bg-slate-800/50'}`}> 
                   <td className="py-4 px-4 text-center align-middle">
                     <input
                       type="checkbox"
-                      className="form-checkbox h-5 w-5 text-blue-600 rounded focus:ring-blue-500 border-slate-300 hover:ring-2 hover:ring-blue-200"
+                      className="form-checkbox h-5 w-5 text-blue-600 rounded focus:ring-blue-500 border-slate-300 dark:border-slate-500 bg-white dark:bg-slate-700 focus:ring-offset-slate-800"
                       checked={selectedIds.includes(service.id)}
                       onChange={() => handleSelect(service.id)}
                     />
                   </td>
                   <td className="py-4 px-6">
-                    <div className="font-medium text-slate-900">{service.title}</div>
+                    <div className="font-medium text-slate-900 dark:text-slate-100">{service.title}</div>
                   </td>
                   <td className="py-4 px-6">
-                    <div className="text-slate-600 max-w-md">{service.description}</div>
+                    <div className="text-slate-600 dark:text-slate-400 max-w-md">{service.description}</div>
                   </td>
                   <td className="py-4 px-6">
                     <a
@@ -238,18 +238,18 @@ export default function ServicesManagement() {
                   </td>
                   <td className="py-4 px-6">
                     <div className="flex items-center space-x-2">
-                      <button className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                      <button className="p-2 text-slate-600 dark:text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-700 rounded-lg transition-colors"
                         onClick={() => handleView(service.id)}
                       >
                         <Eye className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => navigate(`/service-form/${service.id}`)}
-                        className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        className="p-2 text-slate-600 dark:text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-700 rounded-lg transition-colors"
                       >
                         <Edit className="w-4 h-4" />
                       </button>
-                      <button className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      <button className="p-2 text-slate-600 dark:text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-slate-700 rounded-lg transition-colors"
                         onClick={() => handleDelete(service.id)}
                       >
                         <Trash2 className="w-4 h-4" />
@@ -266,25 +266,25 @@ export default function ServicesManagement() {
       {/* Service Detail Modal */}
       {viewService && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-8 shadow-xl max-w-md w-full relative">
+          <div className="bg-white dark:bg-slate-800 rounded-xl p-8 shadow-xl max-w-md w-full relative">
             <button
-              className="absolute top-2 right-2 text-slate-500 hover:text-slate-700"
+              className="absolute top-2 right-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white"
               onClick={() => setViewService(null)}
             >
               &times;
             </button>
             {viewLoading ? (
-              <div className="text-center text-slate-600">Loading...</div>
+              <div className="text-center text-slate-600 dark:text-slate-300">Loading...</div>
             ) : viewError ? (
-              <div className="text-red-500 text-center">
+              <div className="text-red-500 dark:text-red-400 text-center">
                 <p className="font-bold">Error</p>
                 <p>{viewError}</p>
               </div>
             ) : (
               <>
-                <h2 className="text-xl font-bold text-slate-900 mb-2">{viewService.title}</h2>
-                <div className="text-slate-600 mb-4">ID: {viewService.id}</div>
-                <div className="mb-4 text-slate-700">{viewService.description}</div>
+                <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{viewService.title}</h2>
+                <div className="text-slate-600 dark:text-slate-400 mb-4">ID: {viewService.id}</div>
+                <div className="mb-4 text-slate-700 dark:text-slate-300">{viewService.description}</div>
                 <a
                   href={`https://api.thaneforestdivision.com${viewService.file}`}
                   target="_blank"

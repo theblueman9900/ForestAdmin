@@ -98,20 +98,20 @@ export default function ContactsManagement() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Contacts Management</h1>
-          <p className="text-slate-600 mt-1">Manage your contacts</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Contacts Management</h1>
+          <p className="text-slate-600 dark:text-slate-400 mt-1">Manage your contacts</p>
         </div>
       </div>
 
       {deleteError && (
-        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
+        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 dark:bg-red-900/20 dark:border-red-700 dark:text-red-400 p-4 mb-6" role="alert">
           <p className="font-bold">Delete Error</p>
           <p>{deleteError}</p>
         </div>
       )}
 
       {/* Search and Filters */}
-      <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6">
+      <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6 mb-6">
         <div className="flex items-center space-x-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -120,47 +120,47 @@ export default function ContactsManagement() {
               placeholder="Search contacts..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 border border-slate-200 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100"
             />
           </div>
-          <div className="text-sm text-slate-600">
+          <div className="text-sm text-slate-600 dark:text-slate-400">
             {filteredContacts.length} contacts found
           </div>
         </div>
       </div>
 
       {/* Contacts Table */}
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-slate-50 border-b border-slate-200">
+            <thead className="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-200 dark:border-slate-700">
               <tr>
-                <th className="text-left py-3 px-6 font-medium text-slate-900">Name</th>
-                <th className="text-left py-3 px-6 font-medium text-slate-900">Email</th>
-                <th className="text-left py-3 px-6 font-medium text-slate-900">Subject</th>
-                <th className="text-left py-3 px-6 font-medium text-slate-900">Actions</th>
+                <th className="text-left py-3 px-6 font-medium text-slate-900 dark:text-slate-100">Name</th>
+                <th className="text-left py-3 px-6 font-medium text-slate-900 dark:text-slate-100">Email</th>
+                <th className="text-left py-3 px-6 font-medium text-slate-900 dark:text-slate-100">Subject</th>
+                <th className="text-left py-3 px-6 font-medium text-slate-900 dark:text-slate-100">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredContacts.map((contact, index) => (
-                <tr key={contact.id} className={`border-b border-slate-200 hover:bg-slate-50 ${index % 2 === 0 ? 'bg-white' : 'bg-slate-25'}`}>
+                <tr key={contact.id} className={`border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 ${index % 2 === 0 ? 'bg-white dark:bg-slate-800' : 'bg-slate-25 dark:bg-slate-800/50'}`}>
                   <td className="py-4 px-6">
-                    <div className="font-medium text-slate-900">{contact.name}</div>
+                    <div className="font-medium text-slate-900 dark:text-slate-100">{contact.name}</div>
                   </td>
                   <td className="py-4 px-6">
-                    <div className="text-slate-600">{contact.email}</div>
+                    <div className="text-slate-600 dark:text-slate-400">{contact.email}</div>
                   </td>
                   <td className="py-4 px-6">
-                    <div className="text-slate-600">{contact.subject}</div>
+                    <div className="text-slate-600 dark:text-slate-400">{contact.subject}</div>
                   </td>
                   <td className="py-4 px-6">
                     <div className="flex items-center space-x-2">
-                      <button className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                      <button className="p-2 text-slate-600 dark:text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-700 rounded-lg transition-colors"
                         onClick={() => handleView(contact.id)}
                       >
                         <Eye className="w-4 h-4" />
                       </button>
-                      <button className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      <button className="p-2 text-slate-600 dark:text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-slate-700 rounded-lg transition-colors"
                         onClick={() => handleDelete(contact.id)}
                       >
                         <Trash2 className="w-4 h-4" />

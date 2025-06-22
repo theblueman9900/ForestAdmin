@@ -29,7 +29,7 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
   const location = useLocation();
 
   return (
-    <div className={`fixed left-0 top-0 h-full bg-gradient-to-b from-slate-900 to-slate-800 border-r border-slate-700 transition-all duration-300 z-50 ${
+    <div className={`fixed left-0 top-0 h-full bg-slate-900 border-r border-slate-700 transition-all duration-300 z-50 ${
       isCollapsed ? 'w-16' : 'w-64'
     }`}>
       {/* Logo Section */}
@@ -66,7 +66,7 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
                   className={`w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group ${
                     isActive
                       ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/25'
-                      : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'
+                      : 'text-slate-300 hover:bg-slate-700 hover:text-white'
                   }`}
                 >
                   <item.icon className={`w-5 h-5 ${isCollapsed ? 'mx-auto' : 'mr-3'} ${
