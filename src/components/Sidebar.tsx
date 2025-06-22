@@ -9,6 +9,7 @@ import {
   Building2
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import logo from '../res/primary-logo.png';
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -36,7 +37,7 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
         <div className="flex items-center justify-between">
           <div className={`flex items-center space-x-3 ${isCollapsed ? 'justify-center' : ''}`}>
             <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <Building2 className="w-5 h-5 text-white" />
+              <img src={logo} alt="Logo" className="object-contain rounded bg-white" />
             </div>
             {!isCollapsed && (
               <span className="text-xl font-bold text-white">AdminPro</span>

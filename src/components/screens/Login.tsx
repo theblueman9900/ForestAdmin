@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { User, Lock, Eye, EyeOff, Building2 } from 'lucide-react';
+import { User, Lock, Eye, EyeOff } from 'lucide-react';
+import logo from '../../res/primary-logo.png';
 
 interface LoginProps {
   onLogin: (email: string, password: string) => Promise<void>;
@@ -30,8 +31,8 @@ export default function Login({ onLogin }: LoginProps) {
       <div className="w-full max-w-md">
         {/* Logo and Title */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Building2 className="w-8 h-8 text-white" />
+          <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <img src={logo} alt="Logo" className="w-12 h-12 object-contain" />
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">MAHARASHTRA FOREST DEPARTMENT</h1>
           <p className="text-slate-300">Sign in to your admin dashboard</p>
