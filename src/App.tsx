@@ -37,24 +37,25 @@ function App() {
   // Simulate login API call
   const loginApi = async (email: string, password: string): Promise<{ token: string }> => {
     // Replace this with your real API call
-    // Example: const response = await fetch('/api/login', ...)
-    // For now, always succeed and return a fake token
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       setTimeout(() => {
-        resolve({ token: 'fake-jwt-token-123' });
+        // Simulate a 50% chance of failure
+        if (password === 'password123' && email === 'admin@example.com') {
+          resolve({ token: 'fake-jwt-token-123' });
+        } else {
+          reject(new Error('Invalid credentials. Please try again.'));
+        }
       }, 800);
     });
   };
 
   const handleLogin = async (email: string, password: string): Promise<void> => {
     const result = await loginApi(email, password);
-    if (result && result.token) {
-      setIsLoggedIn(true);
-      sessionStorage.setItem('isLoggedIn', 'true');
-      sessionStorage.setItem('token', result.token);
-    } else {
-      throw new Error('Login failed');
-    }
+    // The Login component will handle the error, so we don't need a try-catch here.
+    // If login is successful, update the state.
+    setIsLoggedIn(true);
+    sessionStorage.setItem('isLoggedIn', 'true');
+    sessionStorage.setItem('token', result.token);
   };
 
   const handleLogout = () => {

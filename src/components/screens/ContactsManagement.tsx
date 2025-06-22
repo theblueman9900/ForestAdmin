@@ -15,18 +15,26 @@ export default function ContactsManagement() {
   const [searchTerm, setSearchTerm] = useState('');
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [viewContact, setViewContact] = useState<Contact | null>(null);
   const [viewLoading, setViewLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchContacts = async () => {
+      setLoading(true);
+      setError(null);
       try {
         const response = await fetch('https://api.thaneforestdivision.com/api/contacts/');
+        if (!response.ok) {
+          throw new Error('Failed to fetch contacts.');
+        }
         const data = await response.json();
         setContacts(data);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching contacts:', error);
+        setError(error.message || 'An unexpected error occurred.');
       } finally {
         setLoading(false);
       }
@@ -46,13 +54,17 @@ export default function ContactsManagement() {
 
   const handleDelete = async (id: number) => {
     if (!window.confirm('Are you sure you want to delete this contact?')) return;
+    setDeleteError(null);
     try {
-      await fetch(`https://api.thaneforestdivision.com/api/contacts/${id}/`, {
+      const response = await fetch(`https://api.thaneforestdivision.com/api/contacts/${id}/`, {
         method: 'DELETE',
       });
+      if (!response.ok) {
+        throw new Error('Failed to delete contact.');
+      }
       setContacts(contacts => contacts.filter(c => c.id !== id));
-    } catch (error) {
-      alert('Failed to delete contact.');
+    } catch (error: any) {
+      setDeleteError(error.message || 'An unexpected error occurred.');
     }
   };
 
@@ -70,6 +82,17 @@ export default function ContactsManagement() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="p-6">
+        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4" role="alert">
+          <p className="font-bold">Error</p>
+          <p>{error}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6">
       {/* Header */}
@@ -79,6 +102,13 @@ export default function ContactsManagement() {
           <p className="text-slate-600 mt-1">Manage your contacts</p>
         </div>
       </div>
+
+      {deleteError && (
+        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
+          <p className="font-bold">Delete Error</p>
+          <p>{deleteError}</p>
+        </div>
+      )}
 
       {/* Search and Filters */}
       <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6">

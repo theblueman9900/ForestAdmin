@@ -7,18 +7,49 @@ export default function ContactView() {
   const navigate = useNavigate();
   const [contact, setContact] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (id) {
-      fetch(`https://api.thaneforestdivision.com/api/contacts/${id}/`)
-        .then(res => res.json())
-        .then(data => setContact(data))
-        .finally(() => setLoading(false));
+      const fetchContact = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+          const response = await fetch(`https://api.thaneforestdivision.com/api/contacts/${id}/`);
+          if (!response.ok) {
+            throw new Error('Failed to fetch contact details.');
+          }
+          const data = await response.json();
+          setContact(data);
+        } catch (error: any) {
+          setError(error.message || 'An unexpected error occurred.');
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchContact();
     }
   }, [id]);
 
   if (loading) {
     return <div className="p-6 text-slate-600">Loading contact details...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="p-6">
+        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4" role="alert">
+          <p className="font-bold">Error</p>
+          <p>{error}</p>
+        </div>
+        <button
+          onClick={() => navigate('/contacts')}
+          className="mt-4 text-blue-600 hover:text-blue-700"
+        >
+          Back to Contacts
+        </button>
+      </div>
+    );
   }
 
   if (!contact) {

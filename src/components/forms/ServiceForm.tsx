@@ -9,19 +9,34 @@ export default function ServiceForm() {
   const [description, setDescription] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (id) {
-      fetch(`https://api.thaneforestdivision.com/api/services/${id}/`)
-        .then(res => res.json())
-        .then(data => {
+    const fetchServiceData = async () => {
+      if (id) {
+        setIsLoading(true);
+        setError(null);
+        try {
+          const response = await fetch(`https://api.thaneforestdivision.com/api/services/${id}/`);
+          if (!response.ok) {
+            throw new Error('Failed to fetch service details.');
+          }
+          const data = await response.json();
           setTitle(data.title || '');
           setDescription(data.description || '');
           setPreviewUrl(data.file || '');
-        });
-    }
+        } catch (err) {
+          setError(err instanceof Error ? err.message : 'An error occurred');
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        setIsLoading(false);
+      }
+    };
+    fetchServiceData();
   }, [id]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,7 +53,7 @@ export default function ServiceForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    setIsSubmitting(true);
     setError(null);
 
     try {
@@ -61,19 +76,28 @@ export default function ServiceForm() {
         });
       }
       if (!response.ok) {
-        throw new Error('Failed to save service');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || 'Failed to save service');
       }
       navigate('/services');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred while saving the service');
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
   const handleCancel = () => {
     navigate('/services');
   };
+
+  if (isLoading) {
+    return (
+      <div className="p-6">
+        <div className="text-center text-slate-600">Loading form...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6">
@@ -97,6 +121,12 @@ export default function ServiceForm() {
 
       {/* Form */}
       <div className="bg-white rounded-xl border border-slate-200 p-6">
+        {error && !isSubmitting && (
+          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
+            <p className="font-bold">Error</p>
+            <p>{error}</p>
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Service Title */}
           <div>
@@ -145,16 +175,16 @@ export default function ServiceForm() {
           </div>
 
           {/* Error */}
-          {error && <div className="text-red-600 text-sm">{error}</div>}
+          {error && isSubmitting && <div className="text-red-600 text-sm">{error}</div>}
 
           {/* Actions */}
           <div className="flex space-x-2">
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isSubmitting}
               className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
             >
-              {isLoading ? 'Saving...' : id ? 'Update Service' : 'Add Service'}
+              {isSubmitting ? 'Saving...' : id ? 'Update Service' : 'Add Service'}
             </button>
             <button
               type="button"

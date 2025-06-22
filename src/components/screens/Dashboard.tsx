@@ -16,11 +16,13 @@ export default function Dashboard() {
     contacts: ContactItem[];
   }>({ images: [], videos: [], services: [], contacts: [] });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchAll() {
       setLoading(true);
+      setError(null);
       try {
         const [imagesRes, videosRes, servicesRes, contactsRes] = await Promise.all([
           fetch('https://api.thaneforestdivision.com/api/photos/'),
@@ -34,6 +36,11 @@ export default function Dashboard() {
           servicesRes.json(),
           contactsRes.json(),
         ]);
+
+        if (!imagesRes.ok || !videosRes.ok || !servicesRes.ok || !contactsRes.ok) {
+          throw new Error('Failed to fetch some resources');
+        }
+
         setStats({
           images: images.length,
           videos: videos.length,
@@ -47,7 +54,8 @@ export default function Dashboard() {
           contacts: contacts.slice(0, 3),
         });
       } catch (e) {
-        // handle error
+        setError('Failed to load dashboard data. Please try again later.');
+        console.error(e);
       } finally {
         setLoading(false);
       }
@@ -66,6 +74,13 @@ export default function Dashboard() {
           Here's what's happening with your admin portal today.
         </p>
       </div>
+
+      {error && (
+        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
+          <p className="font-bold">Error</p>
+          <p>{error}</p>
+        </div>
+      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -110,7 +125,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div className="bg-white rounded-xl border border-slate-200 p-6">
           <h3 className="text-lg font-semibold text-slate-900 mb-4">Recent Images</h3>
-          {loading ? <div>Loading...</div> : recent.images.length === 0 ? <div className="text-slate-500">No images</div> : recent.images.map((img) => (
+          {loading ? <div>Loading...</div> : error ? <div className="text-red-500">{error}</div> : recent.images.length === 0 ? <div className="text-slate-500">No images</div> : recent.images.map((img) => (
             <div key={img.id} className="flex items-center mb-2">
               <img src={img.photo} alt={img.name} className="w-10 h-10 object-cover rounded mr-3 border" />
               <div className="flex-1">
@@ -122,7 +137,7 @@ export default function Dashboard() {
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-6">
           <h3 className="text-lg font-semibold text-slate-900 mb-4">Recent Videos</h3>
-          {loading ? <div>Loading...</div> : recent.videos.length === 0 ? <div className="text-slate-500">No videos</div> : recent.videos.map((vid) => (
+          {loading ? <div>Loading...</div> : error ? <div className="text-red-500">{error}</div> : recent.videos.length === 0 ? <div className="text-slate-500">No videos</div> : recent.videos.map((vid) => (
             <div key={vid.id} className="flex items-center mb-2">
               <VideoIcon className="w-8 h-8 text-red-500 mr-3" />
               <div className="flex-1">
@@ -134,7 +149,7 @@ export default function Dashboard() {
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-6">
           <h3 className="text-lg font-semibold text-slate-900 mb-4">Recent Services</h3>
-          {loading ? <div>Loading...</div> : recent.services.length === 0 ? <div className="text-slate-500">No services</div> : recent.services.map((srv) => (
+          {loading ? <div>Loading...</div> : error ? <div className="text-red-500">{error}</div> : recent.services.length === 0 ? <div className="text-slate-500">No services</div> : recent.services.map((srv) => (
             <div key={srv.id} className="flex items-center mb-2">
               <FileText className="w-8 h-8 text-purple-500 mr-3" />
               <div className="flex-1">
@@ -146,7 +161,7 @@ export default function Dashboard() {
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-6">
           <h3 className="text-lg font-semibold text-slate-900 mb-4">Recent Contacts</h3>
-          {loading ? <div>Loading...</div> : recent.contacts.length === 0 ? <div className="text-slate-500">No contacts</div> : recent.contacts.map((c) => (
+          {loading ? <div>Loading...</div> : error ? <div className="text-red-500">{error}</div> : recent.contacts.length === 0 ? <div className="text-slate-500">No contacts</div> : recent.contacts.map((c) => (
             <div key={c.id} className="flex items-center mb-2">
               <Mail className="w-8 h-8 text-orange-500 mr-3" />
               <div className="flex-1">

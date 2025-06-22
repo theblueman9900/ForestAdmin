@@ -13,19 +13,28 @@ export default function ServicesManagement() {
   const [searchTerm, setSearchTerm] = useState('');
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [viewService, setViewService] = useState<Service | null>(null);
   const [viewLoading, setViewLoading] = useState(false);
+  const [viewError, setViewError] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchServices = async () => {
+      setLoading(true);
+      setError(null);
       try {
         const response = await fetch('https://api.thaneforestdivision.com/api/services/');
+        if (!response.ok) {
+          throw new Error('Failed to fetch services.');
+        }
         const data = await response.json();
         setServices(data);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching services:', error);
+        setError(error.message || 'An unexpected error occurred.');
       } finally {
         setLoading(false);
       }
@@ -41,30 +50,38 @@ export default function ServicesManagement() {
 
   const handleDelete = async (id: number) => {
     if (!window.confirm('Are you sure you want to delete this service?')) return;
+    setDeleteError(null);
     try {
-      await fetch(`https://api.thaneforestdivision.com/api/services/${id}/`, {
+      const response = await fetch(`https://api.thaneforestdivision.com/api/services/${id}/`, {
         method: 'DELETE',
       });
+      if (!response.ok) {
+        throw new Error('Failed to delete service.');
+      }
       setServices(services => services.filter(s => s.id !== id));
       setSelectedIds(ids => ids.filter(i => i !== id));
-    } catch (error) {
-      alert('Failed to delete service.');
+    } catch (error: any) {
+      setDeleteError(error.message || 'An unexpected error occurred.');
     }
   };
 
   const handleBulkDelete = async () => {
     if (selectedIds.length === 0) return;
     if (!window.confirm('Are you sure you want to delete the selected services?')) return;
+    setDeleteError(null);
     try {
-      await fetch('https://api.thaneforestdivision.com/api/services/delete-multiple/', {
+      const response = await fetch('https://api.thaneforestdivision.com/api/services/delete-multiple/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ids: selectedIds }),
       });
+      if (!response.ok) {
+        throw new Error('Failed to delete services.');
+      }
       setServices(services => services.filter(s => !selectedIds.includes(s.id)));
       setSelectedIds([]);
-    } catch (error) {
-      alert('Failed to bulk delete services.');
+    } catch (error: any) {
+      setDeleteError(error.message || 'An unexpected error occurred.');
     }
   };
 
@@ -83,12 +100,16 @@ export default function ServicesManagement() {
   const handleView = async (id: number) => {
     setViewLoading(true);
     setViewService(null);
+    setViewError(null);
     try {
       const response = await fetch(`https://api.thaneforestdivision.com/api/services/${id}/`);
+      if (!response.ok) {
+        throw new Error('Failed to load service details.');
+      }
       const data = await response.json();
       setViewService(data);
-    } catch (error) {
-      alert('Failed to load service details.');
+    } catch (error: any) {
+      setViewError(error.message || 'An unexpected error occurred.');
     } finally {
       setViewLoading(false);
     }
@@ -99,6 +120,17 @@ export default function ServicesManagement() {
       <div className="p-6">
         <div className="flex items-center justify-center h-64">
           <div className="text-slate-600">Loading services...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6">
+        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4" role="alert">
+          <p className="font-bold">Error</p>
+          <p>{error}</p>
         </div>
       </div>
     );
@@ -129,6 +161,13 @@ export default function ServicesManagement() {
           </button>
         </div>
       </div>
+
+      {deleteError && (
+        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
+          <p className="font-bold">Delete Error</p>
+          <p>{deleteError}</p>
+        </div>
+      )}
 
       {/* Search and Filters */}
       <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6">
@@ -236,6 +275,11 @@ export default function ServicesManagement() {
             </button>
             {viewLoading ? (
               <div className="text-center text-slate-600">Loading...</div>
+            ) : viewError ? (
+              <div className="text-red-500 text-center">
+                <p className="font-bold">Error</p>
+                <p>{viewError}</p>
+              </div>
             ) : (
               <>
                 <h2 className="text-xl font-bold text-slate-900 mb-2">{viewService.title}</h2>

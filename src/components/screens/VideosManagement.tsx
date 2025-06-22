@@ -12,19 +12,28 @@ export default function VideosManagement() {
   const [searchTerm, setSearchTerm] = useState('');
   const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [viewVideo, setViewVideo] = useState<Video | null>(null);
   const [viewLoading, setViewLoading] = useState(false);
+  const [viewError, setViewError] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchVideos = async () => {
+      setLoading(true);
+      setError(null);
       try {
         const response = await fetch('https://api.thaneforestdivision.com/api/videos/');
+        if (!response.ok) {
+          throw new Error('Failed to fetch videos.');
+        }
         const data = await response.json();
         setVideos(data);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching videos:', error);
+        setError(error.message || 'An unexpected error occurred.');
       } finally {
         setLoading(false);
       }
@@ -39,30 +48,38 @@ export default function VideosManagement() {
 
   const handleDelete = async (id: number) => {
     if (!window.confirm('Are you sure you want to delete this video?')) return;
+    setDeleteError(null);
     try {
-      await fetch(`https://api.thaneforestdivision.com/api/videos/${id}/`, {
+      const response = await fetch(`https://api.thaneforestdivision.com/api/videos/${id}/`, {
         method: 'DELETE',
       });
+      if (!response.ok) {
+        throw new Error('Failed to delete video.');
+      }
       setVideos(videos => videos.filter(v => v.id !== id));
       setSelectedIds(ids => ids.filter(i => i !== id));
-    } catch (error) {
-      alert('Failed to delete video.');
+    } catch (error: any) {
+      setDeleteError(error.message || 'An unexpected error occurred.');
     }
   };
 
   const handleBulkDelete = async () => {
     if (selectedIds.length === 0) return;
     if (!window.confirm('Are you sure you want to delete the selected videos?')) return;
+    setDeleteError(null);
     try {
-      await fetch('https://api.thaneforestdivision.com/api/videos/delete-multiple/', {
+      const response = await fetch('https://api.thaneforestdivision.com/api/videos/delete-multiple/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ids: selectedIds }),
       });
+      if (!response.ok) {
+        throw new Error('Failed to delete videos.');
+      }
       setVideos(videos => videos.filter(v => !selectedIds.includes(v.id)));
       setSelectedIds([]);
-    } catch (error) {
-      alert('Failed to bulk delete videos.');
+    } catch (error: any) {
+      setDeleteError(error.message || 'An unexpected error occurred.');
     }
   };
 
@@ -81,12 +98,16 @@ export default function VideosManagement() {
   const handleView = async (id: number) => {
     setViewLoading(true);
     setViewVideo(null);
+    setViewError(null);
     try {
       const response = await fetch(`https://api.thaneforestdivision.com/api/videos/${id}/`);
+      if (!response.ok) {
+        throw new Error('Failed to load video details.');
+      }
       const data = await response.json();
       setViewVideo(data);
-    } catch (error) {
-      alert('Failed to load video details.');
+    } catch (error: any) {
+      setViewError(error.message || 'An unexpected error occurred.');
     } finally {
       setViewLoading(false);
     }
@@ -97,6 +118,17 @@ export default function VideosManagement() {
       <div className="p-6">
         <div className="flex items-center justify-center h-64">
           <div className="text-slate-600">Loading videos...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6">
+        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4" role="alert">
+          <p className="font-bold">Error</p>
+          <p>{error}</p>
         </div>
       </div>
     );
@@ -127,6 +159,13 @@ export default function VideosManagement() {
           </button>
         </div>
       </div>
+
+      {deleteError && (
+        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
+          <p className="font-bold">Delete Error</p>
+          <p>{deleteError}</p>
+        </div>
+      )}
 
       {/* Search and Filters */}
       <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6">
@@ -237,6 +276,11 @@ export default function VideosManagement() {
             </button>
             {viewLoading ? (
               <div className="text-center text-slate-600">Loading...</div>
+            ) : viewError ? (
+              <div className="text-red-500 text-center">
+                <p className="font-bold">Error</p>
+                <p>{viewError}</p>
+              </div>
             ) : (
               <>
                 <video
